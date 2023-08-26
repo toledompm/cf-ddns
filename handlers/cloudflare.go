@@ -10,7 +10,7 @@ import (
 )
 
 type ICloudflare interface {
-	UpdateRecord(ip string, recordName string, recordZone string, recordType string) error
+	UpdateRecord(ip string, recordName string, recordZone string, proxyEnabled bool, recordType string) error
 }
 
 func NewCloudflare(token string) ICloudflare {
@@ -26,7 +26,7 @@ type CloudflareHandler struct {
 	headers map[string][]string
 }
 
-func (c *CloudflareHandler) UpdateRecord(ip string, recordName string, recordZone string, recordType string) error {
+func (c *CloudflareHandler) UpdateRecord(ip string, recordName string, recordZone string, proxyEnabled bool, recordType string) error {
 	fmt.Printf("Updating record %s with ip %s in zone %s\n", recordName, ip, recordZone)
 
 	recordId, recordValue, err := c.headRecord(recordName, recordZone, recordType)
@@ -36,10 +36,10 @@ func (c *CloudflareHandler) UpdateRecord(ip string, recordName string, recordZon
 
 	if recordId == "" {
 		fmt.Printf("New record detected, creating...\n")
-		err = c.createNewRecord(ip, recordName, recordZone)
+		err = c.createNewRecord(ip, recordName, recordZone, proxyEnabled)
 	} else if recordValue != ip {
 		fmt.Printf("Record found in cloudflare, updating existing record\n")
-		err = c.updateExistingRecord(ip, recordId, recordZone)
+		err = c.updateExistingRecord(ip, recordId, recordZone, proxyEnabled)
 	}
 
 	if err != nil {
@@ -98,14 +98,24 @@ func (c *CloudflareHandler) headRecord(recordName string, recordZone string, rec
 	return "", "", err
 }
 
-func (c *CloudflareHandler) updateExistingRecord(ip string, recordId string, recordZone string) error {
+func (c *CloudflareHandler) updateExistingRecord(ip string, recordId string, recordZone string, proxyEnabled bool) error {
 	requestURL := &url.URL{
 		Scheme: "https",
 		Host:   "api.cloudflare.com",
 		Path:   fmt.Sprintf("/client/v4/zones/%s/dns_records/%s", recordZone, recordId),
 	}
 
-	requestBodyBuffer := bytes.NewBuffer([]byte(fmt.Sprintf(`{"content": "%s"}`, ip)))
+	requestBody := map[string]interface{}{
+		"content": ip,
+		"proxied": proxyEnabled,
+	}
+
+	requestBodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		return err
+	}
+
+	requestBodyBuffer := bytes.NewBuffer(requestBodyBytes)
 
 	request, err := http.NewRequest("PATCH", requestURL.String(), requestBodyBuffer)
 	if err != nil {
@@ -147,7 +157,7 @@ func (c *CloudflareHandler) updateExistingRecord(ip string, recordId string, rec
 	return nil
 }
 
-func (c *CloudflareHandler) createNewRecord(ip string, recordName string, recordZone string) error {
+func (c *CloudflareHandler) createNewRecord(ip string, recordName string, recordZone string, proxyEnabled bool) error {
 	requestURL := &url.URL{
 		Scheme: "https",
 		Host:   "api.cloudflare.com",
@@ -158,7 +168,7 @@ func (c *CloudflareHandler) createNewRecord(ip string, recordName string, record
 		"type":    "AAAA",
 		"name":    recordName,
 		"content": ip,
-		"proxied": true,
+		"proxied": proxyEnabled,
 	}
 
 	requestBodyBytes, err := json.Marshal(requestBody)

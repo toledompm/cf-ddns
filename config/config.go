@@ -13,7 +13,12 @@ type Config struct {
 		ZoneID string `json:"zoneId"`
 	} `json:"cloudflare"`
 
-	Records []string `json:"records"`
+	Records []struct {
+		// Name is the name of the record
+		Name string `json:"name"`
+		// Proxy is a flag to enable or disable proxy
+		Proxy bool `json:"proxy"`
+	} `json:"records"`
 
 	IPV6 struct {
 		// Enabled is a flag to enable or disable IPV6

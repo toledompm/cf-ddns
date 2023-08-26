@@ -27,7 +27,7 @@ var (
 
 			for _, record := range cfg.Records {
 				if cfg.IPV6.Enabled {
-					err = cf.UpdateRecord(ipv6, record, cfg.Cloudflare.ZoneID, "AAAA")
+					err = cf.UpdateRecord(ipv6, record.Name, cfg.Cloudflare.ZoneID, record.Proxy, "AAAA")
 					if err != nil {
 						fmt.Printf("Error updating record: %s\n", err)
 						os.Exit(1)

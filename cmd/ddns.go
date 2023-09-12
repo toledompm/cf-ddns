@@ -61,7 +61,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "(required) path to config file")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "/etc/cf-ddns/config.json", "(required) path to config file")
 }
 
 func initConfig() {

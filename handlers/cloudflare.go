@@ -36,7 +36,7 @@ func (c *CloudflareHandler) UpdateRecord(ip string, recordName string, recordZon
 
 	if recordId == "" {
 		fmt.Printf("New record detected, creating...\n")
-		err = c.createNewRecord(ip, recordName, recordZone, proxyEnabled)
+		err = c.createNewRecord(ip, recordName, recordZone, proxyEnabled, recordType)
 	} else if recordValue != ip {
 		fmt.Printf("Record found in cloudflare, updating existing record\n")
 		err = c.updateExistingRecord(ip, recordId, recordZone, proxyEnabled)
@@ -157,7 +157,7 @@ func (c *CloudflareHandler) updateExistingRecord(ip string, recordId string, rec
 	return nil
 }
 
-func (c *CloudflareHandler) createNewRecord(ip string, recordName string, recordZone string, proxyEnabled bool) error {
+func (c *CloudflareHandler) createNewRecord(ip string, recordName string, recordZone string, proxyEnabled bool, recordType string) error {
 	requestURL := &url.URL{
 		Scheme: "https",
 		Host:   "api.cloudflare.com",
@@ -165,7 +165,7 @@ func (c *CloudflareHandler) createNewRecord(ip string, recordName string, record
 	}
 
 	requestBody := map[string]interface{}{
-		"type":    "AAAA",
+		"type":    recordType,
 		"name":    recordName,
 		"content": ip,
 		"proxied": proxyEnabled,

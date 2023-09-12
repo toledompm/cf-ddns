@@ -3,7 +3,10 @@ ddns service for Cloudflare. Currently only supports A and AAAA records.
 
 ## Usage
 
-This is a WIP project, so no install script is provided yet. You can use the systemd files as a reference to setup your own service.
+Install with curl
+```
+curl -s https://raw.githubusercontent.com/toledompm/cf-ddns/install.sh | sudo sh
+```
 
 ### Configuration
 cf-ddns is configured using a json file. The default location is `/etc/cf-ddns/config.json`. You can specify a different location using the `-c` flag.

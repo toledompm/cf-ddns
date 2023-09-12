@@ -19,22 +19,33 @@ var (
 		Short: "Cloudflare DDNS Updater",
 		Long:  `Cloudflare DDNS Updater is a simple tool to update Cloudflare DNS records with your current IP address.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			ipv6, err := nw.GetIPV6()
-			if err != nil {
-				fmt.Printf("Error getting IP: %s\n", err)
-				os.Exit(1)
-			}
-
 			for _, record := range cfg.Records {
 				if cfg.IPV6.Enabled {
+					ipv6, err := nw.GetIPV6()
+					if err != nil {
+						fmt.Printf("Error getting IP: %s\n", err)
+						os.Exit(1)
+					}
+
 					err = cf.UpdateRecord(ipv6, record.Name, cfg.Cloudflare.ZoneID, record.Proxy, "AAAA")
 					if err != nil {
 						fmt.Printf("Error updating record: %s\n", err)
 						os.Exit(1)
 					}
-				} else {
-					fmt.Println("Only ipv6 is supported at this time")
-					os.Exit(1)
+				}
+
+				if cfg.IPV4.Enabled {
+					ipv4, err := nw.GetIPV4()
+					if err != nil {
+						fmt.Printf("Error getting IP: %s\n", err)
+						os.Exit(1)
+					}
+
+					err = cf.UpdateRecord(ipv4, record.Name, cfg.Cloudflare.ZoneID, record.Proxy, "A")
+					if err != nil {
+						fmt.Printf("Error updating record: %s\n", err)
+						os.Exit(1)
+					}
 				}
 			}
 		},
@@ -69,5 +80,5 @@ func initConfig() {
 	cfg = config.MustParseConfig(cfgFileBytes, cfg)
 
 	cf = handlers.NewCloudflare(cfg.Cloudflare.Token)
-	nw = handlers.NewNetwork(cfg.IPV6.FetchAddress)
+	nw = handlers.NewNetwork(cfg.IPV6.FetchAddress, cfg.IPV4.FetchAddress)
 }

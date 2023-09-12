@@ -26,6 +26,13 @@ type Config struct {
 		// FetchAddress is the URL to fetch the current IPV6 address
 		FetchAddress string `json:"fetchAddress"`
 	} `json:"ipv6"`
+
+	IPV4 struct {
+		// Enabled is a flag to enable or disable IPV4
+		Enabled bool `json:"enabled"`
+		// FetchAddress is the URL to fetch the current IPV4 address
+		FetchAddress string `json:"fetchAddress"`
+	} `json:"ipv4"`
 }
 
 func New() *Config {

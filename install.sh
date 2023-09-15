@@ -1,4 +1,6 @@
-#! /bin/bash
+#!/usr/bin/env bash
+
+{ # This ensures the entire script is downloaded. #
 
 if [[ "$EUID" -ne 0 ]]; then
   echo "Please run as root"
@@ -31,8 +33,8 @@ fi
 # Download and install the latest binary
 curl -s https://api.github.com/repos/toledompm/cf-ddns/releases/tags/${latest_version} \
   | grep "browser_download_url.*${os_name}-${arch_name}" \
-  | cut -d '"' -f 4 |
-  xargs -n 1 curl -Ls -o cf-ddns
+  | cut -d '"' -f 4 \
+  | xargs -n 1 curl -Ls -o cf-ddns
 
 chmod +x cf-ddns
 
@@ -42,8 +44,11 @@ mv cf-ddns /usr/local/bin/cf-ddns
 mkdir -p /etc/cf-ddns
 
 read -p "Enter your Cloudflare API token: " token
+
 read -p "Enter your Cloudflare zoneId: " zone_id
+
 read -p "Enable IPv6? (y/N): " ipv6_enabled
+
 ipv6_enabled=${ipv6_enabled:-"n"}
 if [[ $ipv6_enabled == "y" ]]; then
   ipv6_enabled=true
@@ -99,3 +104,5 @@ if [[ $systemd_enabled ]]; then
 fi
 
 echo "Change the records in /etc/cf-ddns/config.json and run 'systemctl start cf-ddns' to start the service."
+
+}

@@ -21,7 +21,7 @@ fi
 arch_name=$(uname -m)
 if [[ $arch_name == "x86_64" ]]; then
   arch_name="amd64"
-elif [[ $arch_name == "aarch64" ] || [[ $arch_name == "arm64" ]]; then
+elif [[ $arch_name == "aarch64" ]] || [[ $arch_name == "arm64" ]]; then
   arch_name="arm64"
 else
   echo "Unsupported architecture"

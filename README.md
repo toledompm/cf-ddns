@@ -5,7 +5,7 @@ ddns service for Cloudflare. Currently only supports A and AAAA records.
 
 Install with curl
 ```
-curl -s https://raw.githubusercontent.com/toledompm/cf-ddns/install.sh | sudo sh
+curl -s https://raw.githubusercontent.com/toledompm/cf-ddns/main/install.sh | sudo bash
 ```
 
 ### Configuration

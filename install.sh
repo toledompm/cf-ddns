@@ -48,13 +48,13 @@ read -p "Enter your Cloudflare API token: " token
 read -p "Enter your Cloudflare zoneId: " zone_id
 
 read -p "Enable IPv6? (y/N): " ipv6_enabled
-
 ipv6_enabled=${ipv6_enabled:-"n"}
 if [[ $ipv6_enabled == "y" ]]; then
   ipv6_enabled=true
 else
   ipv6_enabled=false
 fi
+
 read -p "Enable IPv4? (y/N): " ipv4_enabled
 ipv4_enabled=${ipv4_enabled:-"n"}
 if [[ $ipv4_enabled == "y" ]]; then
@@ -62,10 +62,12 @@ if [[ $ipv4_enabled == "y" ]]; then
 else
   ipv4_enabled=false
 fi
+
 read -p "Enter the address to use for fetching IPv6 (default: https://myexternalip.com/json): " ipv6_fetch_address
 ipv6_fetch_address=${ipv6_fetch_address:-"https://myexternalip.com/json"}
-read -p "Enter the address to use for fetching IPv4 (default: https://myexternalip.com/raw): " ipv4_fetch_address
-ipv4_fetch_address=${ipv4_fetch_address:-"https://myexternalip.com/raw"}
+
+read -p "Enter the address to use for fetching IPv4 (default: https://myexternalip.com/json): " ipv4_fetch_address
+ipv4_fetch_address=${ipv4_fetch_address:-"https://myexternalip.com/json"}
 
 cat > /etc/cf-ddns/config.json <<EOF
   {

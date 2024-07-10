@@ -21,7 +21,7 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, record := range cfg.Records {
 				if cfg.IPV6.Enabled {
-					ipv6, err := nw.GetIPV6()
+					ipv6, err := nw.GetPublicIPV6()
 					if err != nil {
 						fmt.Printf("Error getting IP: %s\n", err)
 						os.Exit(1)
@@ -35,10 +35,21 @@ var (
 				}
 
 				if cfg.IPV4.Enabled {
-					ipv4, err := nw.GetIPV4()
-					if err != nil {
-						fmt.Printf("Error getting IP: %s\n", err)
-						os.Exit(1)
+					var ipv4 string
+					var err error
+
+					if cfg.IPV4.FetchAddress == "" {
+						ipv4, err = nw.GetPrivateIPV4()
+						if err != nil {
+							fmt.Printf("Error getting IP: %s\n", err)
+							os.Exit(1)
+						}
+					} else {
+						ipv4, err = nw.GetPublicIPV4()
+						if err != nil {
+							fmt.Printf("Error getting IP: %s\n", err)
+							os.Exit(1)
+						}
 					}
 
 					err = cf.UpdateRecord(ipv4, record.Name, cfg.Cloudflare.ZoneID, record.Proxy, "A")
@@ -80,5 +91,5 @@ func initConfig() {
 	cfg = config.MustParseConfig(cfgFileBytes, cfg)
 
 	cf = handlers.NewCloudflare(cfg.Cloudflare.Token)
-	nw = handlers.NewNetwork(cfg.IPV6.FetchAddress, cfg.IPV4.FetchAddress)
+	nw = handlers.NewNetwork(cfg.IPV6.FetchAddress, cfg.IPV4.FetchAddress, cfg.IPV4.Interface)
 }

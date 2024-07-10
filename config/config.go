@@ -30,8 +30,10 @@ type Config struct {
 	IPV4 struct {
 		// Enabled is a flag to enable or disable IPV4
 		Enabled bool `json:"enabled"`
-		// FetchAddress is the URL to fetch the current IPV4 address
+		// FetchAddress is the URL to fetch the current IPV4 address. If empty, the private IPV4 address will be used.
 		FetchAddress string `json:"fetchAddress"`
+		// Interface is the name of the interface to fetch the private IPV4 address. If empty, the first non-loopback IPV4 address will be used.
+		Interface string `json:"interface"`
 	} `json:"ipv4"`
 }
 
